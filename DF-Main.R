@@ -17,6 +17,13 @@
 #  be made to calibrate the model to actual data
 #  but for now I'm only looking for results that are
 #  qualitatively consistent with observed data.  
+#
+#  In the model the agents (members of a DZ or MZ twin pair)
+#  Have a genetic endowment that shapes cognitive ability
+#  and another which determins their preference for different
+#  types of environments. Environments have two aspects: 
+#  cognitive demands and an index value for attractiveness
+#  to different types of people. 
 #  
 ######################################################
 
@@ -53,13 +60,13 @@ ParentGenes <- RandomBin(NAL, 2 * N)
 #   Will be filled in below. The first half of the columns will be DZ twins and the second
 #     half will be MZ twins
 
-TwinGenes <- matrix(0, nrows=NAL, ncols=2*N )
+TwinGenes <- matrix(0, nrow=NAL, ncol=2*N )
 
 #   ChVec will be used to determine which allels come from parent 1 vs. parent 2
 
 ChVec <- c(matrix(0, 1, NAL/2), matrix(1, 1, NAL/2) )
 
-for (i in 1:N){
+for (i in 1:(N/2)){
   
   # Dizygote twins first -- each gets a random half of each parents genes
   
@@ -72,14 +79,17 @@ for (i in 1:N){
   WhichParentMZ <- sample(ChVec)# Allel selection vector for MZ twin pairs
   
   # Loop over allels for all twins
-  for (j in 1:NAL) {
+  for (j in 1:(NAL)) {
+    
     # DZ Twin 1 first
-    TwinGenes[j, i * 2 - 1] <- ParentGenes[j, i * 2 - 1 + WhichParent1[j]]
+    TwinGenes[j, i * 2 - 1] <- unlist(ParentGenes[j, i * 2 - 1 + WhichParent1[j]])
+    
     # DZ Twin 2
-    TwinGenes[j, i * 2] <- ParentGenes[j, i * 2 - 1 + WhichParent2[j]]
+    TwinGenes[j, i * 2] <- unlist(ParentGenes[j, i * 2 - 1 + WhichParent2[j]])
+    
     # MZ Twin 1
-    TwinGenes[j, N + i * 2 - 1] <- ParentGenes[j, N + i * 2 - 1 + WhichParentMZ[j] ] 
+    TwinGenes[j, N + i * 2 - 1] <- unlist(ParentGenes[j, N + i * 2 - 1 + WhichParentMZ[j]])
   }
   # MZ Twin 2 has same genome as Twin 1 so...
-  TwinGenes[, N + i * 2] <- TwinGenes[, N + 1 * 2] 
+  TwinGenes[, N + i * 2] <- TwinGenes[, N + i * 2 - 1] 
 }
